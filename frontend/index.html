@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>ResearchLens — Evidence-Grounded Research Agent</title>
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- ================= BACKGROUND ================= -->
+
+  <div class="bg-fx">
+    <div class="grid-overlay"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div id="particles"></div>
+  </div>
+
+
+  <!-- ================= NAVIGATION ================= -->
+
+  <nav class="nav">
+
+    <a href="/" class="brand">
+      <span class="brand-mark">🔍</span>
+      <span>
+        Research<span class="brand-accent">Lens</span>
+      </span>
+    </a>
+
+    <div class="nav-links">
+      <a href="/" class="active">Research</a>
+      <a href="#sources">Sources</a>
+      <a href="#about">About</a>
+    </div>
+
+    <div class="nav-cta">
+      <span class="chip">
+        <span class="chip-dot"></span>
+        Agent Online
+      </span>
+    </div>
+
+  </nav>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <main class="page">
+
+    <section class="ask-layout" id="research">
+
+      <!-- ================= SIDEBAR ================= -->
+
+      <aside class="ask-side">
+
+        <!-- Sources -->
+
+        <div class="card side-card" id="sources">
+
+          <h4>📚 Source Documents</h4>
+
+          <button
+            class="btn btn-ghost btn-sm"
+            style="width:100%; margin-bottom:12px;"
+            onclick="document.getElementById('file-input').click()"
+          >
+            ＋ Add Sources
+          </button>
+
+          <input
+            type="file"
+            id="file-input"
+            multiple
+            accept=".pdf,.txt,.md"
+            style="display:none;"
+            onchange="uploadFiles(this)"
+          >
+
+          <div id="file-list">
+            <div style="
+              color:var(--text-faint);
+              font-size:0.78rem;
+              text-align:center;
+              padding:12px 4px;
+            ">
+              No documents loaded yet.
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- Search Settings -->
+
+        <div class="card side-card">
+
+          <h4>⚙️ Research Settings</h4>
+
+          <div class="toggle-row">
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                id="web-toggle"
+                checked
+              />
+              <span class="slider"></span>
+            </label>
+
+            <span class="toggle-label">
+              Web search
+            </span>
+
+          </div>
+
+          <p style="
+            color:var(--text-faint);
+            font-size:0.72rem;
+            margin-top:8px;
+            line-height:1.5;
+          ">
+            Uses DuckDuckGo when provided sources
+            don't contain sufficient evidence.
+          </p>
+
+        </div>
+
+
+        <!-- Retrieval Info -->
+
+        <div class="card side-card">
+
+          <h4>🧠 Retrieval</h4>
+
+          <div style="
+            font-family:var(--font-mono);
+            font-size:0.72rem;
+            color:var(--text-faint);
+            line-height:1.9;
+          ">
+            <div>
+              <span style="color:var(--cyan);">●</span>
+              In-memory TF-IDF
+            </div>
+
+            <div>
+              <span style="color:var(--violet);">●</span>
+              Cosine similarity
+            </div>
+
+            <div>
+              <span style="color:var(--pink);">●</span>
+              Evidence grounding
+            </div>
+
+            <div>
+              <span style="color:var(--green);">●</span>
+              Citation tracking
+            </div>
+          </div>
+
+        </div>
+
+      </aside>
+
+
+      <!-- ================= RESEARCH PANEL ================= -->
+
+      <section class="ask-panel">
+
+        <!-- Header -->
+
+        <div class="ask-head">
+
+          <h3>
+            <span>🔬</span>
+            Research Assistant
+          </h3>
+
+          <span class="chip">
+            GROQ · Llama 3.3 70B
+          </span>
+
+        </div>
+
+
+        <!-- Results -->
+
+        <div class="results-area" id="results-area">
+
+          <!-- Empty state -->
+
+          <div class="empty-state" id="empty-state">
+
+            <div class="e-ico">🔍</div>
+
+            <h3>Ask a research question</h3>
+
+            <p>
+              Upload your source documents and ask a question.
+              ResearchLens retrieves relevant evidence and
+              generates an answer with citations.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Suggestions -->
+
+        <div class="suggestions">
+
+          <button
+            class="sugg"
+            onclick="useSuggestion(this)"
+          >
+            Summarize the main findings
+          </button>
+
+          <button
+            class="sugg"
+            onclick="useSuggestion(this)"
+          >
+            Compare the key arguments
+          </button>
+
+          <button
+            class="sugg"
+            onclick="useSuggestion(this)"
+          >
+            What evidence supports the conclusion?
+          </button>
+
+          <button
+            class="sugg"
+            onclick="useSuggestion(this)"
+          >
+            What information is missing?
+          </button>
+
+        </div>
+
+
+        <!-- Input -->
+
+        <div class="ask-input">
+
+          <textarea
+            id="question"
+            rows="1"
+            placeholder="Ask a research question..."
+            onkeydown="handleQuestionKey(event)"
+          ></textarea>
+
+          <button
+            class="send-btn"
+            id="ask-btn"
+            onclick="askQuestion()"
+            title="Ask ResearchLens"
+          >
+            ➤
+          </button>
+
+        </div>
+
+      </section>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================= ABOUT ================= -->
+
+  <section class="about-section" id="about">
+
+    <div class="about-inner">
+
+      <h2>About ResearchLens</h2>
+
+      <p>
+        ResearchLens is an evidence-grounded research assistant.
+        Upload your source documents, ask a question, and get an
+        answer built only from what those sources — and optionally
+        live web results — actually say, with every claim tied
+        back to a numbered citation.
+      </p>
+
+      <div class="about-grid">
+
+        <div class="card about-card">
+          <h4>🧠 Retrieval</h4>
+          <p>
+            Uploaded files are chunked and ranked against your
+            question using TF-IDF and cosine similarity — fast,
+            deterministic, and easy to reason about.
+          </p>
+        </div>
+
+        <div class="card about-card">
+          <h4>📎 Citations</h4>
+          <p>
+            Every claim in an answer is linked to a
+            <code>[Source N]</code> so you can verify exactly
+            where it came from.
+          </p>
+        </div>
+
+        <div class="card about-card">
+          <h4>🌐 Web Search</h4>
+          <p>
+            When your uploaded sources don't fully cover the
+            question, ResearchLens can optionally pull in live
+            DuckDuckGo results to fill the gaps.
+          </p>
+        </div>
+
+        <div class="card about-card">
+          <h4>⚠️ Honest Gaps</h4>
+          <p>
+            If something can't be answered from the available
+            sources, ResearchLens says so explicitly instead of
+            guessing.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <div class="section-divider"></div>
+
+
+  <!-- ================= TOASTS ================= -->
+
+  <div id="toasts"></div>
+
+
+  <!-- ================= FOOTER ================= -->
+
+  <footer class="footer">
+
+    <div>
+      ResearchLens · Evidence-Grounded Research Agent
+    </div>
+
+    <div>
+      TF-IDF retrieval · Groq · DuckDuckGo · FastAPI
+    </div>
+
+  </footer>
+
+
+  <!-- ================= JAVASCRIPT ================= -->
+
+  <script>
+
+    const API = '';
+
+    let loadedFiles = [];
+
+
+    /* ==================================================
+       UPLOAD DOCUMENTS
+    ================================================== */
+
+    async function uploadFiles(input) {
+
+      const files = Array.from(input.files);
+
+      if (!files.length) return;
+
+      showToast(
+        'Uploading and parsing documents...',
+        'ok'
+      );
+
+      const form = new FormData();
+
+      files.forEach(file => {
+        form.append('files', file);
+      });
+
+      try {
+
+        const response = await fetch(
+          `${API}/upload`,
+          {
+            method: 'POST',
+            body: form
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Upload request failed');
+        }
+
+        const data = await response.json();
+
+        if (data.uploaded) {
+
+          data.uploaded.forEach(file => {
+
+            if (!loadedFiles.includes(file.filename)) {
+              loadedFiles.push(file.filename);
+            }
+
+          });
+
+        }
+
+        renderFileList();
+
+        const uploadedCount =
+          data.uploaded
+            ? data.uploaded.length
+            : 0;
+
+        showToast(
+          `✓ ${uploadedCount} document(s) loaded`,
+          'ok'
+        );
+
+      } catch (error) {
+
+        showToast(
+          'Upload failed: ' + error.message,
+          'err'
+        );
+
+      } finally {
+
+        input.value = '';
+
+      }
+
+    }
+
+
+    /* ==================================================
+       RENDER DOCUMENT LIST
+    ================================================== */
+
+    function renderFileList() {
+
+      const list =
+        document.getElementById('file-list');
+
+      if (!loadedFiles.length) {
+
+        list.innerHTML = `
+          <div style="
+            color:var(--text-faint);
+            font-size:0.78rem;
+            text-align:center;
+            padding:12px 4px;
+          ">
+            No documents loaded yet.
+          </div>
+        `;
+
+        return;
+      }
+
+      list.innerHTML =
+        loadedFiles.map((filename, index) => {
+
+          return `
+            <div class="doc-item">
+
+              <span class="d-ico">
+                📄
+              </span>
+
+              <span
+                class="d-name"
+                title="${escapeHTML(filename)}"
+              >
+                ${escapeHTML(filename)}
+              </span>
+
+              <span class="d-stat">
+                S${index + 1}
+              </span>
+
+            </div>
+          `;
+
+        }).join('');
+
+    }
+
+
+    /* ==================================================
+       ASK QUESTION
+    ================================================== */
+
+    async function askQuestion() {
+
+      const input =
+        document.getElementById('question');
+
+      const question =
+        input.value.trim();
+
+      if (!question) {
+
+        showToast(
+          'Please enter a research question.',
+          'err'
+        );
+
+        return;
+      }
+
+
+      const useWeb =
+        document.getElementById('web-toggle').checked;
+
+      const button =
+        document.getElementById('ask-btn');
+
+      const results =
+        document.getElementById('results-area');
+
+
+      button.disabled = true;
+
+      showTypingIndicator();
+
+
+      try {
+
+        const response = await fetch(
+          `${API}/ask`,
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({
+              question: question,
+              use_web: useWeb,
+              top_k: 6
+            })
+          }
+        );
+
+
+        if (!response.ok) {
+
+          let message = 'Request failed';
+
+          try {
+
+            const error =
+              await response.json();
+
+            message =
+              error.detail || message;
+
+          } catch (_) {}
+
+          throw new Error(message);
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        removeTypingIndicator();
+
+        renderAnswer(
+          question,
+          data
+        );
+
+
+        showToast(
+          `✓ Research complete · ${data.chunks_used ?? 0} evidence chunks`,
+          'ok'
+        );
+
+
+      } catch (error) {
+
+        removeTypingIndicator();
+
+        showToast(
+          'Research failed: ' + error.message,
+          'err'
+        );
+
+      } finally {
+
+        button.disabled = false;
+
+      }
+
+    }
+
+
+    /* ==================================================
+       RENDER ANSWER
+    ================================================== */
+
+    function renderAnswer(question, data) {
+
+      const results =
+        document.getElementById('results-area');
+
+
+      const empty =
+        document.getElementById('empty-state');
+
+      if (empty) {
+        empty.remove();
+      }
+
+
+      const qa =
+        document.createElement('div');
+
+      qa.className = 'qa-block';
+
+
+      /* QUESTION */
+
+      const questionElement =
+        document.createElement('div');
+
+      questionElement.className =
+        'qa-question';
+
+      questionElement.textContent =
+        question;
+
+
+      /* ANSWER WRAPPER */
+
+      const answerWrapper =
+        document.createElement('div');
+
+      answerWrapper.className =
+        'qa-answer-wrap';
+
+
+      /* ANSWER */
+
+      const answer =
+        document.createElement('div');
+
+      answer.className =
+        'qa-answer';
+
+      answer.textContent =
+        data.answer || 'No answer returned.';
+
+
+      /* META */
+
+      const meta =
+        document.createElement('div');
+
+      meta.className =
+        'qa-meta';
+
+      meta.innerHTML = `
+        <span>
+          ${data.chunks_used ?? 0} evidence chunks
+        </span>
+
+        <span>
+          ${data.documents_loaded ?? loadedFiles.length} documents
+        </span>
+
+        ${
+          data.web_used
+            ? '<span>🌐 Web search used</span>'
+            : '<span>📚 Provided sources</span>'
+        }
+      `;
+
+
+      answerWrapper.appendChild(answer);
+      answerWrapper.appendChild(meta);
+
+
+      /* SOURCES */
+
+      if (
+        Array.isArray(data.sources) &&
+        data.sources.length
+      ) {
+
+        const sources =
+          document.createElement('div');
+
+        sources.className = 'srcs';
+
+
+        const toggle =
+          document.createElement('button');
+
+        toggle.className =
+          'src-toggle';
+
+        toggle.innerHTML = `
+          <span>📎 Evidence & Sources</span>
+          <span class="cnt">
+            ${data.sources.length}
+          </span>
+        `;
+
+
+        toggle.onclick = () => {
+          sources.classList.toggle('open');
+        };
+
+
+        const panel =
+          document.createElement('div');
+
+        panel.className =
+          'src-panel';
+
+
+        data.sources.forEach(
+          (source, index) => {
+
+            const card =
+              document.createElement('div');
+
+            const isWeb =
+              source.type === 'web';
+
+
+            card.className =
+              `src-card${isWeb ? ' web' : ''}`;
+
+
+            const label =
+              source.label ||
+              source.title ||
+              `Source ${source.source_id ?? index + 1}`;
+
+
+            const url =
+              source.url;
+
+
+            card.innerHTML = `
+
+              <div class="s-label">
+
+                <span>
+                  ${isWeb ? '🌐' : '📄'}
+                </span>
+
+                <span>
+                  [S${source.source_id ?? index + 1}]
+                  ${escapeHTML(label)}
+                </span>
+
+              </div>
+
+
+              ${
+                source.type
+                  ? `
+                    <div class="s-type">
+                      ${escapeHTML(source.type)}
+                    </div>
+                  `
+                  : ''
+              }
+
+
+              ${
+                url
+                  ? `
+                    <div class="s-url">
+                      <a
+                        href="${escapeAttribute(url)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        ${escapeHTML(url)}
+                      </a>
+                    </div>
+                  `
+                  : ''
+              }
+
+
+              ${
+                source.score !== undefined
+                  ? `
+                    <div class="s-score">
+                      relevance: ${source.score}
+                    </div>
+                  `
+                  : ''
+              }
+
+            `;
+
+
+            panel.appendChild(card);
+
+          }
+        );
+
+
+        sources.appendChild(toggle);
+        sources.appendChild(panel);
+
+        answerWrapper.appendChild(sources);
+
+      }
+
+
+      qa.appendChild(questionElement);
+      qa.appendChild(answerWrapper);
+
+      results.appendChild(qa);
+
+
+      /* Scroll to newest result */
+
+      results.scrollTo({
+        top: results.scrollHeight,
+        behavior: 'smooth'
+      });
+
+    }
+
+
+    /* ==================================================
+       TYPING INDICATOR
+    ================================================== */
+
+    function showTypingIndicator() {
+
+      const results =
+        document.getElementById('results-area');
+
+
+      const existing =
+        document.getElementById(
+          'typing-indicator'
+        );
+
+      if (existing) return;
+
+
+      const typing =
+        document.createElement('div');
+
+      typing.id =
+        'typing-indicator';
+
+      typing.className =
+        'qa-block';
+
+
+      typing.innerHTML = `
+
+        <div class="qa-answer-wrap">
+
+          <div class="qa-answer">
+
+            <span class="typing-dots">
+
+              <span></span>
+              <span></span>
+              <span></span>
+
+            </span>
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      results.appendChild(typing);
+
+
+      results.scrollTo({
+        top: results.scrollHeight,
+        behavior: 'smooth'
+      });
+
+    }
+
+
+    function removeTypingIndicator() {
+
+      const typing =
+        document.getElementById(
+          'typing-indicator'
+        );
+
+      if (typing) {
+        typing.remove();
+      }
+
+    }
+
+
+    /* ==================================================
+       SUGGESTIONS
+    ================================================== */
+
+    function useSuggestion(button) {
+
+      const question =
+        document.getElementById('question');
+
+      question.value =
+        button.textContent.trim();
+
+      question.focus();
+
+      autoResize(question);
+
+    }
+
+
+    /* ==================================================
+       KEYBOARD
+    ================================================== */
+
+    function handleQuestionKey(event) {
+
+      /*
+       * Ctrl + Enter → submit
+       */
+
+      if (
+        event.ctrlKey &&
+        event.key === 'Enter'
+      ) {
+
+        event.preventDefault();
+
+        askQuestion();
+
+      }
+
+
+      /*
+       * Auto resize textarea
+       */
+
+      autoResize(event.target);
+
+    }
+
+
+    function autoResize(element) {
+
+      element.style.height = 'auto';
+
+      element.style.height =
+        Math.min(
+          element.scrollHeight,
+          140
+        ) + 'px';
+
+    }
+
+
+    /* ==================================================
+       TOASTS
+    ================================================== */
+
+    function showToast(message, type = '') {
+
+      const container =
+        document.getElementById('toasts');
+
+
+      const toast =
+        document.createElement('div');
+
+      toast.className =
+        `toast ${type}`;
+
+
+      toast.textContent =
+        message;
+
+
+      container.appendChild(toast);
+
+
+      setTimeout(() => {
+
+        toast.classList.add('bye');
+
+        setTimeout(() => {
+          toast.remove();
+        }, 350);
+
+      }, 3200);
+
+    }
+
+
+    /* ==================================================
+       SECURITY HELPERS
+    ================================================== */
+
+    function escapeHTML(value) {
+
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    }
+
+
+    function escapeAttribute(value) {
+
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    }
+
+
+    /* ==================================================
+       INITIALIZE
+    ================================================== */
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+
+        renderFileList();
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
