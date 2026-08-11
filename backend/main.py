@@ -34,25 +34,25 @@ from fastapi.responses import FileResponse
 load_dotenv()
 
 
-BASE_DIR = Path(__file__).resolve().parent
-FRONTEND_DIR = BASE_DIR.parent / "frontend"
+#BASE_DIR = Path(__file__).resolve().parent
+#FRONTEND_DIR = BASE_DIR.parent / "frontend"
 
 app = FastAPI(
     title="ResearchLens API",
     description="Evidence-grounded research agent with citations",
     version="1.0.0"
 )
-
+'''
 app.mount(
-    "/frontend",
-    StaticFiles(directory=FRONTEND_DIR),
-    name="frontend"
+#  "/frontend",
+   StaticFiles(directory=FRONTEND_DIR),
+   name="frontend"
 )
 
 @app.get("/")
 async def root():
     return FileResponse(FRONTEND_DIR / "index.html")
-
+'''
 
 # Allow frontend (same origin or localhost dev) to call the API
 app.add_middleware(
@@ -70,7 +70,7 @@ LOADED_DOCUMENTS: dict = {}
 UPLOAD_DIR = tempfile.mkdtemp()
 
 # Output log file for saving results
-#RESULTS_FILE = os.path.join(os.path.dirname(__file__), "..", "sample_outputs", "results.json")
+RESULTS_FILE = os.path.join(os.path.dirname(__file__), "..", "sample_outputs", "results.json")
 
 
 # ---------------------------------------------------------------------------

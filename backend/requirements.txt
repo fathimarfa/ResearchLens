@@ -9,3 +9,4 @@ ddgs==9.14.4
 scikit-learn==1.5.0
 numpy==1.26.4
 aiofiles==23.2.1
+pytest
