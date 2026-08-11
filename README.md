@@ -38,7 +38,7 @@ ResearchLens/
 │
 ├── frontend/
 │   ├── index.html            ← Single-file UI (upload, ask, view cited answer)
-│   ├── log.svg
+│   ├── logo.svg
 │   └── style.css          
 │
 │
@@ -104,6 +104,7 @@ Never commit .env to GitHub. Keep your actual API key private.
 Start the FastAPI server with:
 
 ```bash
+cd backend #because main.py is inside backend
 python -m uvicorn main:app --reload --port 8000
 ```
 You should see something similar to:
@@ -151,8 +152,8 @@ easy review of past Q&A.
 - **TF-IDF, not embeddings.** Fast and dependency-light, but it matches on
   literal terms — it won't connect "car" with "automobile". Swap in an
   embedding model in `retriever.py` if you need semantic recall.
-- **Web search degrades gracefully.** If `duckduckgo_search` isn't installed
-  or DuckDuckGo rate-limits the request, `retrieve()` just falls back to
+- **Web search degrades gracefully.** If `duckduckgo_search`(now ddgs) isn't installed
+  or DuckDuckGo(ddgs) rate-limits the request, `retrieve()` just falls back to
   file-only results instead of failing the request.
 - **CORS is wide open** (`allow_origins=["*"]`) for local development —
   tighten this before deploying anywhere public.
